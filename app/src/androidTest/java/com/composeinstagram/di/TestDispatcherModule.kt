@@ -9,22 +9,34 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import javax.inject.Named
 import javax.inject.Singleton
-
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
     replaces = [DispatcherModule::class]
 )
 object TestDispatcherModule {
+
+
+    @Provides
+    @Singleton
+    @Named("TestDispatcher")
+    fun provideTestDispatcher(): TestCoroutineDispatcher = TestCoroutineDispatcher()
+
     @Provides
     @Singleton
     @Named("MainDispatcher")
-    fun provideMainDispatcher(): CoroutineDispatcher = TestCoroutineDispatcher()
+    fun provideMainDispatcher(
+        @Named("TestDispatcher")
+        testCoroutineDispatcher: TestCoroutineDispatcher
+    ): CoroutineDispatcher = testCoroutineDispatcher
 
 
     @Provides
     @Singleton
     @Named("IODispatcher")
-    fun provideIODispatcher(): CoroutineDispatcher = TestCoroutineDispatcher()
+    fun provideIODispatcher(
+        @Named("TestDispatcher")
+        testCoroutineDispatcher: TestCoroutineDispatcher
+    ): CoroutineDispatcher = testCoroutineDispatcher
 }

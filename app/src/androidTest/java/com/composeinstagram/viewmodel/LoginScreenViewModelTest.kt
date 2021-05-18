@@ -1,14 +1,15 @@
 package com.composeinstagram.viewmodel
 
-
 import com.composeinstagram.helper.FakeIGClientHelper
 import com.composeinstagram.helper.IGClientHelperInterface
-import com.composeinstagram.wrapper.CachedIGClientState
-import com.google.common.truth.Truth.assertThat
+import com.composeinstagram.wrapper.LoginState
+import com.google.common.truth.Truth
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -16,9 +17,9 @@ import org.junit.Test
 import javax.inject.Inject
 import javax.inject.Named
 
-@HiltAndroidTest
 @ExperimentalCoroutinesApi
-class MainViewModelTest {
+@HiltAndroidTest
+class LoginScreenViewModelTest {
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
@@ -32,13 +33,13 @@ class MainViewModelTest {
     @Named("TestDispatcher")
     lateinit var testCoroutineDispatcher: TestCoroutineDispatcher
 
-    lateinit var viewModel: MainViewModel
+    lateinit var viewModel: LoginScreenViewModel
 
     @Before
     fun setUp() {
         hiltRule.inject()
-        viewModel = MainViewModel(igClientHelper, testCoroutineDispatcher, testCoroutineDispatcher)
-
+        viewModel =
+            LoginScreenViewModel(igClientHelper, testCoroutineDispatcher, testCoroutineDispatcher)
     }
 
     @After
@@ -47,22 +48,22 @@ class MainViewModelTest {
     }
 
     /**
-     * cachedIGClientState should be Success when the user login before
+     * loginState should be Success when the user login
      * */
     @Test
-    fun t1() {
-        assertThat(viewModel.cachedIGClientState is CachedIGClientState.Success).isTrue()
+    fun t1() = testCoroutineDispatcher.runBlockingTest {
+        viewModel.login("test", "1234")
+        Truth.assertThat(viewModel.loginState.first() is LoginState.Success).isTrue()
     }
 
     /**
-     * cachedIGClientState should be Fail when the user NOT login before
+     * loginState should be Fail when the user login failed
      * */
     @Test
-    fun t2() {
-        fakeIGClientHelper.shouldCachedIGClientReturnNull = true
-        viewModel = MainViewModel(igClientHelper, testCoroutineDispatcher, testCoroutineDispatcher)
-        assertThat(viewModel.cachedIGClientState is CachedIGClientState.Fail).isTrue()
+    fun t2() = testCoroutineDispatcher.runBlockingTest {
+        fakeIGClientHelper.shouldLoginReturnNull = true
+        viewModel.login("test", "1234")
+        Truth.assertThat(viewModel.loginState.first() is LoginState.Fail).isTrue()
     }
-
 
 }
