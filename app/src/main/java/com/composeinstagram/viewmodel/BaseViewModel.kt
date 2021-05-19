@@ -11,10 +11,7 @@ abstract class BaseViewModel(
     private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    /**
-     * sets from [MainViewModel.init] or [LoginScreenViewModel.login]
-     * */
-    lateinit var currentIGClient: IGClient
+
 
     fun doInMain(action: suspend () -> Unit) {
         viewModelScope.launch(mainDispatcher) {

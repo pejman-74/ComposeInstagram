@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.composeinstagram.helper.IGClientHelperInterface
 import com.composeinstagram.wrapper.CachedIGClientState
+import com.github.instagram4j.instagram4j.IGClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -16,6 +17,11 @@ class MainViewModel @Inject constructor(
     @Named("MainDispatcher") mainDispatcher: CoroutineDispatcher,
     @Named("IODispatcher") ioDispatcher: CoroutineDispatcher
 ) : BaseViewModel(mainDispatcher, ioDispatcher) {
+
+    /**
+     * sets from [init]
+     * */
+    lateinit var currentIGClient: IGClient
 
     var cachedIGClientState by mutableStateOf<CachedIGClientState>(CachedIGClientState.Initial)
 

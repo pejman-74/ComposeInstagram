@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltNavGraphViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.composeinstagram.R
 import com.composeinstagram.ui.component.CustomPasswordVisualTransformation
 import com.composeinstagram.ui.component.LoginTextField
@@ -36,7 +37,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
-    lViewModel: LoginScreenViewModel = hiltNavGraphViewModel(),
+    lViewModel: LoginScreenViewModel = hiltViewModel(),
     navToMain: () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()

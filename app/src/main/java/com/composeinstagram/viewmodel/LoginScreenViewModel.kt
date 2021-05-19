@@ -34,7 +34,6 @@ class LoginScreenViewModel @Inject constructor(
             val state = if (igClient == null) {
                 LoginState.Fail
             } else {
-                currentIGClient = igClient
                 LoginState.Success
             }
             loginStateChanel.send(state)

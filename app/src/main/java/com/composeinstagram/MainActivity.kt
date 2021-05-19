@@ -7,14 +7,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.hilt.navigation.compose.hiltNavGraphViewModel
-import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import com.composeinstagram.ui.screen.LoginScreen
 import com.composeinstagram.ui.theme.ComposeInstagramTheme
@@ -34,7 +31,15 @@ class MainActivity : ComponentActivity() {
                     startDestination = SplashRoute
                 ) {
                     composable(SplashRoute) {
-                        SplashScreen(navController)
+                        SplashScreen(
+                            navToMain = {
+                                navController.navigate(MainRoute)
+                            },
+                            navToLogin = {
+                                navController.navigate(LoginRoute) {
+                                    popUpTo(SplashRoute) { inclusive = true }
+                                }
+                            })
                     }
                     composable(LoginRoute) {
                         LoginScreen {
@@ -53,21 +58,20 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SplashScreen(
-    navController: NavController,
-    mViewModel: MainViewModel = hiltNavGraphViewModel()
+    navToMain: () -> Unit,
+    navToLogin: () -> Unit,
+    mViewModel: MainViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(key1 = mViewModel.cachedIGClientState) {
-        if (mViewModel.cachedIGClientState == CachedIGClientState.Success)
-            navController.navigate(MainRoute)
-        else if (mViewModel.cachedIGClientState == CachedIGClientState.Fail)
-            navController.navigate(LoginRoute)
-    }
-
     Box(
         modifier = Modifier
             .background(Color.Green)
             .fillMaxSize()
     )
+
+    if (mViewModel.cachedIGClientState == CachedIGClientState.Success)
+        navToMain()
+    else if (mViewModel.cachedIGClientState == CachedIGClientState.Fail)
+        navToLogin()
 }
 
 @Composable
