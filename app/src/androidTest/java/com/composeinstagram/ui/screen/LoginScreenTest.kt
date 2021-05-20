@@ -4,12 +4,14 @@ package com.composeinstagram.ui.screen
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.composeinstagram.MainActivity
 import com.composeinstagram.R
 import com.composeinstagram.helper.FakeIGClientHelper
 import com.composeinstagram.helper.IGClientHelperInterface
+import com.composeinstagram.viewmodel.MainViewModel
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -31,6 +33,7 @@ class LoginScreenTest {
     @Inject
     lateinit var igClientHelper: IGClientHelperInterface
 
+
     private val fakeIGClientHelper get() = igClientHelper as FakeIGClientHelper
 
     private val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
@@ -39,9 +42,11 @@ class LoginScreenTest {
 
     private fun setContent() {
         composeTestRule.activity.setContent {
-            LoginScreen(navToMain = {
-                navToMainInvoked = true
-            })
+            LoginScreen(
+                mViewModel = viewModel(modelClass = MainViewModel::class.java),
+                navToMain = {
+                    navToMainInvoked = true
+                })
         }
     }
 

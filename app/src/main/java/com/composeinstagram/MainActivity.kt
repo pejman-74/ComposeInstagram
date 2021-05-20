@@ -9,11 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.composeinstagram.ui.screen.LoginScreen
+import com.composeinstagram.ui.screen.MainScreen
 import com.composeinstagram.ui.theme.ComposeInstagramTheme
 import com.composeinstagram.viewmodel.MainViewModel
 import com.composeinstagram.wrapper.CachedIGClientState
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val mViewModel: MainViewModel = viewModel()
             ComposeInstagramTheme {
                 val navController = rememberNavController()
                 NavHost(
@@ -32,6 +34,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable(SplashRoute) {
                         SplashScreen(
+                            mViewModel,
                             navToMain = {
                                 navController.navigate(MainRoute)
                             },
@@ -39,15 +42,16 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(LoginRoute) {
                                     popUpTo(SplashRoute) { inclusive = true }
                                 }
-                            })
+                            }
+                        )
                     }
                     composable(LoginRoute) {
-                        LoginScreen {
+                        LoginScreen(mViewModel) {
                             navController.navigate(MainRoute)
                         }
                     }
                     composable(MainRoute) {
-                        MainScreen()
+                        MainScreen(mViewModel)
                     }
                 }
 
@@ -58,9 +62,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SplashScreen(
+    mViewModel: MainViewModel,
     navToMain: () -> Unit,
-    navToLogin: () -> Unit,
-    mViewModel: MainViewModel = hiltViewModel()
+    navToLogin: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -74,13 +78,5 @@ fun SplashScreen(
         navToLogin()
 }
 
-@Composable
-fun MainScreen() {
-    Box(
-        modifier = Modifier
-            .background(Color.Red)
-            .fillMaxSize()
-    )
-}
 
 

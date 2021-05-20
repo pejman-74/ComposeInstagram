@@ -31,18 +31,20 @@ import com.composeinstagram.ui.theme.loginButtonDisabledBackground
 import com.composeinstagram.ui.theme.loginButtonDisabledTextColor
 import com.composeinstagram.ui.theme.loginButtonTextColor
 import com.composeinstagram.viewmodel.LoginScreenViewModel
+import com.composeinstagram.viewmodel.MainViewModel
 import com.composeinstagram.wrapper.LoginState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
+    mViewModel: MainViewModel,
     lViewModel: LoginScreenViewModel = hiltViewModel(),
     navToMain: () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-    val loginState by lViewModel.loginState.collectAsState(null)
+    val loginState by mViewModel.loginState.collectAsState(null)
 
     val showLastChar by produceState(initialValue = true, key1 = lViewModel.passwordTextState) {
         if (lViewModel.lastPasswordLength < lViewModel.passwordTextState.length) {
@@ -119,7 +121,7 @@ fun LoginScreen(
                 enabled = lViewModel.userNameTextState != "" && lViewModel.passwordTextState != "",
                 shape = MaterialTheme.shapes.medium,
                 onClick = {
-                    lViewModel.login(lViewModel.userNameTextState, lViewModel.passwordTextState)
+                    mViewModel.login(lViewModel.userNameTextState, lViewModel.passwordTextState)
                 }
 
             ) {

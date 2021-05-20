@@ -15,7 +15,6 @@ import javax.inject.Named
 
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
-    private val igClientHelper: IGClientHelperInterface,
     @Named("MainDispatcher") mainDispatcher: CoroutineDispatcher,
     @Named("IODispatcher") ioDispatcher: CoroutineDispatcher
 ) : BaseViewModel(mainDispatcher, ioDispatcher) {
@@ -23,21 +22,5 @@ class LoginScreenViewModel @Inject constructor(
     var userNameTextState by mutableStateOf("")
     var passwordTextState by mutableStateOf("")
     var lastPasswordLength by mutableStateOf(0)
-
-    private val loginStateChanel =
-        Channel<LoginState>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    val loginState = loginStateChanel.receiveAsFlow()
-
-    fun login(userName: String, password: String) = doInIO {
-        loginStateChanel.send(LoginState.Loading)
-        igClientHelper.login(userName, password).let { igClient ->
-            val state = if (igClient == null) {
-                LoginState.Fail
-            } else {
-                LoginState.Success
-            }
-            loginStateChanel.send(state)
-        }
-    }
 
 }

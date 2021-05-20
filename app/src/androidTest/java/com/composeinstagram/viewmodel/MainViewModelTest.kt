@@ -4,11 +4,15 @@ package com.composeinstagram.viewmodel
 import com.composeinstagram.helper.FakeIGClientHelper
 import com.composeinstagram.helper.IGClientHelperInterface
 import com.composeinstagram.wrapper.CachedIGClientState
+import com.composeinstagram.wrapper.LoginState
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -64,5 +68,22 @@ class MainViewModelTest {
         assertThat(viewModel.cachedIGClientState is CachedIGClientState.Fail).isTrue()
     }
 
+    /**
+     * loginState should be Success when the user login
+     * */
+    @Test
+    fun t3() = testCoroutineDispatcher.runBlockingTest {
+        viewModel.login("test", "1234")
+        assertThat(viewModel.loginState.first() is LoginState.Success).isTrue()
+    }
 
+    /**
+     * loginState should be Fail when the user login failed
+     * */
+    @Test
+    fun t4() = testCoroutineDispatcher.runBlockingTest {
+        fakeIGClientHelper.shouldLoginReturnNull = true
+        viewModel.login("test", "1234")
+        assertThat(viewModel.loginState.first() is LoginState.Fail).isTrue()
+    }
 }

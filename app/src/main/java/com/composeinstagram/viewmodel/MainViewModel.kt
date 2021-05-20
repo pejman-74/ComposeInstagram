@@ -5,9 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.composeinstagram.helper.IGClientHelperInterface
 import com.composeinstagram.wrapper.CachedIGClientState
+import com.composeinstagram.wrapper.LoginState
 import com.github.instagram4j.instagram4j.IGClient
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -18,12 +23,17 @@ class MainViewModel @Inject constructor(
     @Named("IODispatcher") ioDispatcher: CoroutineDispatcher
 ) : BaseViewModel(mainDispatcher, ioDispatcher) {
 
+
+    var cachedIGClientState by mutableStateOf<CachedIGClientState>(CachedIGClientState.Initial)
+    private val loginStateChanel =
+        Channel<LoginState>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val loginState = loginStateChanel.receiveAsFlow()
+
     /**
-     * sets from [init]
+     * sets from [init] or [login]
      * */
     lateinit var currentIGClient: IGClient
 
-    var cachedIGClientState by mutableStateOf<CachedIGClientState>(CachedIGClientState.Initial)
 
     init {
         /**
@@ -39,11 +49,24 @@ class MainViewModel @Inject constructor(
                         CachedIGClientState.Success
                     }
                 }
-            }
 
+            }
         }
+
     }
 
+    fun login(userName: String, password: String) = doInIO {
+        loginStateChanel.send(LoginState.Loading)
+        igClientHelper.login(userName, password).let { igClient ->
+            val state = if (igClient == null) {
+                LoginState.Fail
+            } else {
+                currentIGClient = igClient
+                LoginState.Success
+            }
+            loginStateChanel.send(state)
+        }
+    }
 
 }
 
