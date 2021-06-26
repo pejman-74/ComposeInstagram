@@ -4,17 +4,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.composeinstagram.helper.IGClientHelperInterface
+import com.composeinstagram.wrapper.ActionState
 import com.composeinstagram.wrapper.CachedIGClientState
 import com.composeinstagram.wrapper.LoginState
 import com.github.instagram4j.instagram4j.IGClient
+import com.github.instagram4j.instagram4j.models.feed.Reel
+import com.github.instagram4j.instagram4j.responses.feed.FeedTimelineResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 import javax.inject.Named
+
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -67,6 +70,24 @@ class MainViewModel @Inject constructor(
             loginStateChanel.send(state)
         }
     }
+
+    var feedStory by mutableStateOf<ActionState<List<Reel>>?>(null)
+
+    fun feedStory() = doInIO {
+        feedStory = ActionState.Loading
+        runCatching {
+            val tray = currentIGClient.actions.story().tray().get().tray
+            feedStory = ActionState.Success(tray)
+        }.onFailure {
+            feedStory = ActionState.Fail(it)
+        }
+
+    }
+
+    val feedPost: FeedTimelineResponse by lazy {
+        currentIGClient.actions.timeline().feed().first()
+    }
+
 
 }
 

@@ -36,3 +36,8 @@ val Colors.loginButtonDisabledBackground: Color
 val Colors.loginButtonDisabledTextColor: Color
     @Composable
     get() = if (isLight) Color(0xF3DCEEFF) else Color(0xF3255581)
+
+
+val storyItemBorderGradiantRed = Color(0xFFD72367)
+
+val storyItemBorderGradiantOrange = Color(0xFFF7AF5E)

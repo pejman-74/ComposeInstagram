@@ -5,4 +5,6 @@
     <string name="password_textfield_hint">Password</string>
     <string name="logein">Log In</string>
     <string name="login_failed">Login Failed!</string>
+    <string name="your_story">Your Story</string>
+    <string name="view_all_comments">View all %s comments</string>
 </resources>
